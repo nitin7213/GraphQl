@@ -1,62 +1,47 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-//Apollo Imports
-const { ApolloServer } = require("@apollo/server");
-const { expressMiddleware } = require("@apollo/server/express4");
 
-//APIS
-const { USERS } = require("./user");
-const { TODOS } = require("./todo");
+// Apollo Server imports
+const { ApolloServer } = require("apollo-server-express");
+const typeDefs = require("./schema/typeDefs");
+const resolvers = require("./schema/resolvers");
 
 const startServer = async () => {
-  const app = express();
+  // Create an Apollo server with debug enabled
   const server = new ApolloServer({
-    typeDefs: `
-        type User {
-            id: ID!
-            name: String!
-            username: String!
-            email: String!
-            phone: String!
-            website: String!
-        }
-
-        type Todo {
-            id: ID!
-            title: String!
-            completed: Boolean
-            user: User
-        }
-
-        type Query {
-            getTodos: [Todo]
-            getAllUsers: [User]
-            getUser(id: ID!): User
-        }
-
-    `,
-    resolvers: {
-      Todo: {
-        user: (todo) => USERS.find((e) => e.id === todo.id),
-      },
-      Query: {
-        getTodos: () => TODOS,
-        getAllUsers: () => USERS,
-        getUser: async (parent, { id }) => USERS.find((e) => e.id === id),
-      },
+    typeDefs,
+    resolvers,
+    debug: true, // Enable detailed error messages
+    formatError: (err) => {
+      // Log detailed error information
+      console.error(err);
+      return err;
     },
-    debug: true,
   });
 
+  // Start the Apollo Server
+  await server.start();
+
+  // Create an Express application
+  const app = express();
+
+  // Apply middleware
   app.use(bodyParser.json());
   app.use(cors());
 
-  await server.start();
+  // Apply Apollo GraphQL middleware to the Express application
+  server.applyMiddleware({ app, path: "/graphql" });
 
-  app.use("/graphql", expressMiddleware(server));
-
-  app.listen(8000, () => console.log("Serevr Started at PORT 8000"));
+  // Start the Express server
+  const PORT = process.env.PORT || 8000;
+  app.listen(PORT, () =>
+    console.log(
+      `Server started at http://localhost:${PORT}${server.graphqlPath}`
+    )
+  );
 };
 
-startServer();
+startServer().catch((err) => {
+  console.error("Error starting server:", err);
+});
