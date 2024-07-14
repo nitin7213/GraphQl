@@ -1,50 +1,21 @@
+// src/App.js
 import React from "react";
-import { gql, useQuery } from "@apollo/client";
+import Users from "./components/Users";
+import Todos from "./components/Todos";
+import CreateUser from "./components/CreateUser";
+import DeleteUser from "./components/DeleteUser";
+import GetUser from "./components/GetUser";
 
-const query = gql`
-  query GetTodosWithUser {
-    getTodos {
-      id
-      title
-      completed
-      user {
-        id
-        name
-      }
-    }
-  }
-`;
+const App = () => (
+  <div>
+    <h1>GraphQL Apollo Client Demo</h1>
 
-function App() {
-  const { data, loading } = useQuery(query);
-
-  if (loading) return <h1>Loading...</h1>;
-
-  return (
-    <div className="App">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Completed</th>
-            <th>User Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data?.getTodos?.map((todo) => (
-            <tr key={todo?.id}>
-              <td>{todo?.id}</td>
-              <td>{todo?.title}</td>
-              <td>{todo?.completed.toString()}</td>{" "}
-              {/* Convert Boolean to string */}
-              <td>{todo?.user?.name}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+    <GetUser />
+    <Users />
+    <CreateUser />
+    <DeleteUser />
+    <Todos />
+  </div>
+);
 
 export default App;

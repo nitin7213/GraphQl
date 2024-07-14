@@ -1,4 +1,4 @@
-exports.USERS = [
+export const USERS = [
   {
     id: 1,
     name: "Leanne Graham",
@@ -230,3 +230,5 @@ exports.USERS = [
     },
   },
 ];
+
+export default USERS;

@@ -1,6 +1,23 @@
-const { gql } = require("apollo-server-express");
+const typeDefs = `#graphql
+  type Query {
+    getTodos: [Todo!]!
+    getAllUsers: [User!]!
+    getUser(id: ID!): User
+  }
 
-const typeDefs = gql`
+  type Mutation {
+    createUser(input: CreateUserInput!): User
+    deleteUser(id: ID!): Boolean
+  }
+
+  input CreateUserInput {
+    name: String!
+    username: String!
+    email: String!
+    phone: String!
+    website: String!
+  }
+
   type Todo {
     id: ID!
     title: String!
@@ -37,16 +54,6 @@ const typeDefs = gql`
     catchPhrase: String!
     bs: String!
   }
-
-  type Query {
-    getTodos: [Todo!]!
-  }
 `;
 
-module.exports = typeDefs;
-
-// type Query {
-//   getTodos: [Todo!]!
-//   getAllUsers: [User!]!
-//   getUser(id: ID!): User
-// }
+export default typeDefs;
