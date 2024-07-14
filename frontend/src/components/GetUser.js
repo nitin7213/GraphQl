@@ -1,18 +1,20 @@
 // src/components/GetUser.js
 import React, { useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { GET_USER } from "../graphql/queries";
 
 const GetUser = () => {
   const [id, setId] = useState("");
-  const { data, loading, error, refetch } = useQuery(GET_USER, {
-    variables: { id },
-    skip: !id,
-  });
+  const [fetchData, { loading, data, error }] = useLazyQuery(GET_USER);
+
+  /* UseLazyQuery: Ideal for scenarios where you want to delay
+    the execution of a query until a specific event occurs,
+    such as a user action (e.g., clicking a button). 
+  */
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    refetch();
+    fetchData({ variables: { id } });
   };
 
   if (loading) return <p>Loading...</p>;
